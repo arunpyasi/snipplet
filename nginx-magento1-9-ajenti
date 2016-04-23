@@ -1,0 +1,48 @@
+server {
+listen 80;
+  server_name www.angel1wholesale.com angel1wholesale.com;
+ return 301 https://$server_name$request_uri;
+}
+
+
+server {
+    listen *:443 ssl;
+    ssl_certificate /etc/letsencrypt/live/angel1wholesale.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/angel1wholesale.com/privkey.pem;
+    server_name www.angel1wholesale.com;
+
+    access_log /var/log/nginx/wwwangel1wholesalecom.access.log;
+    error_log /var/log/nginx/wwwangel1wholesalecom.error.log;
+
+    root /srv/angel1wholesale.com;
+    index index.html index.htm index.php;
+
+    location / {
+    index index.html index.php;
+    try_files $uri $uri/ @handler;
+    expires 30d;
+}
+
+location /. {
+    return 404;
+}
+
+location @handler {
+    rewrite / /index.php;
+}
+
+location ~ .php/ {
+    rewrite ^(.*.php)/ $1 last;
+}
+
+    
+    location ~ [^/]\.php(/|$) {
+        
+        fastcgi_index index.php;
+        include fcgi.conf;
+        fastcgi_pass unix:/var/run/ajenti-v-php-fcgi-wwwangel1wholesalecom-php-fcgi-0.sock;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+
+    }
+
+}
